@@ -18,7 +18,10 @@ void master(int argc, const char** argv)
 
     singleton<LoggerFactory>::instance()->SetLevel(
         LogLevel::Error,
-        LogLevel::Panic);
+        LogLevel::Panic,
+        LogLevel::Debug,
+        LogLevel::Info,
+        LogLevel::Warning);
 
     if (const auto& level = parser.present("-l")) {
         std::vector<std::string> logLevel =
@@ -45,7 +48,15 @@ void master(int argc, const char** argv)
 int main(int argc, const char** argv)
 {
     try {
-        master(argc, argv);
+        const char* arguments[] = 
+        {
+            argv[0],
+            "-i",
+            "/home/aksenofo/PROJECT/mnt/LEXA/orp/1_123_1088442028.dbf",
+            "-l",
+            "Debug|Info|Warning"
+        } ;
+        master(sizeof(arguments) / sizeof(*arguments), arguments);
     } catch (const std::exception& ex) {
         std::cerr << "ERROR: " << ex.what() << std::endl;
         return 1;
