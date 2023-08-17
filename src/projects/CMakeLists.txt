@@ -5,6 +5,5 @@
 #
 ###################################################################################################
 
-add_subdirectory(test)
-add_subdirectory(projects)
-add_subdirectory(base)
+add_subdirectory(relodi-file-sniffer)
+add_subdirectory(relodi-common)

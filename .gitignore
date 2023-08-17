@@ -1,0 +1,5 @@
+/html/
+/build/
+*.dump
+.cache
+.vs
