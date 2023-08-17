@@ -4,5 +4,5 @@
 #
 
 function(USE_ARGPARCE)
-    include_directories(${PROJECT_3TH_MODULE}/argparse/include/argparse)
+    include_directories(${PROJECT_3TH_MODULE}/argparse/include)
 endfunction()
