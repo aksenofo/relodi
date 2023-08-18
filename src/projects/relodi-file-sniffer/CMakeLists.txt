@@ -4,6 +4,8 @@
 #
 
 include_modules(src/base/common)
+include_modules(src/projects/relodi-common)
+
 USE_ARGPARCE()
 
 #--------------------------------------------------------------------------------------------------
@@ -16,6 +18,7 @@ add_executable(relodi-file-sniffer
 )
 
 target_link_libraries(relodi-file-sniffer
+    relodi-common
     common
     ${DEF_MT_LIB}
     ${DEF_SYS_LIB}

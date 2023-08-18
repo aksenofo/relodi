@@ -111,6 +111,8 @@ private:
                 << ">> " << m_prefixText << ss.str() << std::endl;
         else
             out << m_prefixText << ss.str() << std::endl;
+
+        out.flush();
     }
 
     std::unique_ptr<std::mutex> m_mutex;                                             //! Protect mutex

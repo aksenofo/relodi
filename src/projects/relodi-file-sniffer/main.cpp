@@ -1,10 +1,12 @@
 #include <argparse/argparse.hpp>
 #include <common.h>
 #include <exception>
+#include <format.h>
+#include <fstream>
+#include <header_block0.h>
 #include <log.h>
 #include <set>
 #include <singleton.h>
-#include <format.h>
 
 void master(int argc, const char** argv)
 {
@@ -45,21 +47,25 @@ void master(int argc, const char** argv)
             singleton<LoggerFactory>::instance()->SetLevelByString(p);
         });
     }
-//    LOG(Error) << format("TTTIIIIIIIIIIIIIIIIIIIII");
+    std::string relogFile = parser.get<std::string>("-i");
 
+    LOG(Info) << format("Process file:%1.", relogFile);
+    std::ifstream is(relogFile);
+    is.exceptions(std::ofstream::badbit | std::ofstream::failbit);
+    relodi::common::Block0 b0(is);
+    LOG(Info) << format("Blocksize:%1 Blockcount:%2.", b0.header().blocksize, b0.header().blockcount);
 }
 
 int main(int argc, const char** argv)
 {
     try {
-        const char* arguments[] = 
-        {
+        const char* arguments[] = {
             argv[0],
             "-i",
             "/home/aksenofo/PROJECT/mnt/LEXA/orp/1_123_1088442028.dbf",
             "-l",
             "Debug|Info|Warning"
-        } ;
+        };
         master(sizeof(arguments) / sizeof(*arguments), arguments);
     } catch (const std::exception& ex) {
         std::cerr << "ERROR: " << ex.what() << std::endl;

@@ -8,34 +8,10 @@
 #include <cstdint>
 #include <istream>
 #include <memory>
+#include <relodi-common.h>
 
 namespace relodi::common
 {
-
-namespace utility
-{
-static bool need_to_correct = false;
-inline void correct(uint16_t& val)
-{
-    if (need_to_correct) {
-        auto t = val;
-        val = (t >> 8) | (t << 8);
-    }
-}
-
-inline void correct(uint32_t& val)
-{
-    if (need_to_correct) {
-        auto t = val;
-        val = ((t >> 24) & 0xff) |
-            ((t << 8) & 0xff0000) |
-            ((t >> 8) & 0xff00) |
-            ((t << 24) & 0xff000000);
-    }
-}
-
-} // namespace utility
-
 class Block0
 {
 public:
@@ -50,17 +26,21 @@ public:
 #pragma pack(pop)
 
 public:
-
-    Block0(std::iostream& stream)
-    : header_(std::make_unique<header_0>())
+    Block0(std::istream& is)
+    : m_header(std::make_unique<header_0>())
     {
-        stream.read(reinterpret_cast<char*>(header_.get()), sizeof(header_0));
-        utility::correct(header_->blocksize);
-        utility::correct(header_->blockcount);
+        is.read(reinterpret_cast<char*>(m_header.get()), sizeof(header_0));
+        utility::correct(m_header->blocksize);
+        utility::correct(m_header->blockcount);
+    }
+
+    const header_0& header() const noexcept
+    {
+        return *m_header;
     }
 
 private:
-    std::unique_ptr<header_0> header_;
+    std::unique_ptr<header_0> m_header;
 };
 
 } // namespace relodi::common
