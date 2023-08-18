@@ -70,7 +70,7 @@ void master(int argc, const char** argv)
     }
 
     auto duration = std::chrono::steady_clock::now() - startTime;
-    LOG(Info) << format("Time spet:%1 mS.", 
+    LOG(Info) << format("Time spent:%1 mS.", 
         std::chrono::duration_cast<std::chrono::milliseconds>(duration).count());
 }
 
