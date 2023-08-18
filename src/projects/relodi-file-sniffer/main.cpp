@@ -4,6 +4,7 @@
 #include <format.h>
 #include <fstream>
 #include <header_block0.h>
+#include <header_block1.h>
 #include <log.h>
 #include <set>
 #include <singleton.h>
@@ -54,6 +55,15 @@ void master(int argc, const char** argv)
     is.exceptions(std::ofstream::badbit | std::ofstream::failbit);
     relodi::common::Block0 b0(is);
     LOG(Info) << format("Blocksize:%1 Blockcount:%2.", b0.header().blocksize, b0.header().blockcount);
+    for (size_t t = 0; t < b0.header().blockcount; ++t) {
+        relodi::common::Block1 b1(b0.header().blocksize, is);
+        LOG(Info) << format("Signature:%1 Blocknum: %2 Checksum:%3 Filenum:%4 offset:%5",
+            b1.header().signature,
+            b1.header().blocknum,
+            b1.header().checksum,
+            b1.header().filenum,
+            b1.header().offset);
+    }
 }
 
 int main(int argc, const char** argv)
