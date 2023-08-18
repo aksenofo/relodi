@@ -1,4 +1,5 @@
 #include <argparse/argparse.hpp>
+#include <chrono>
 #include <common.h>
 #include <exception>
 #include <format.h>
@@ -51,6 +52,9 @@ void master(int argc, const char** argv)
     std::string relogFile = parser.get<std::string>("-i");
 
     LOG(Info) << format("Process file:%1.", relogFile);
+
+    auto startTime = std::chrono::steady_clock::now();
+
     std::ifstream is(relogFile);
     is.exceptions(std::ofstream::badbit | std::ofstream::failbit);
     relodi::common::Block0 b0(is);
@@ -64,6 +68,10 @@ void master(int argc, const char** argv)
             b1.header().filenum,
             b1.header().offset);
     }
+
+    auto duration = std::chrono::steady_clock::now() - startTime;
+    LOG(Info) << format("Time spet:%1 mS.", 
+        std::chrono::duration_cast<std::chrono::milliseconds>(duration).count());
 }
 
 int main(int argc, const char** argv)
