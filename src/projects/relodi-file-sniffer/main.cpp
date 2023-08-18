@@ -4,6 +4,7 @@
 #include <log.h>
 #include <set>
 #include <singleton.h>
+#include <format.h>
 
 void master(int argc, const char** argv)
 {
@@ -15,6 +16,7 @@ void master(int argc, const char** argv)
 
     singleton<LoggerFactory>::instance()->SetPrintTimeStamp(true);
     singleton<LoggerFactory>::instance()->SetAppPrefix(argv[0]);
+    singleton<LoggerFactory>::instance()->SetOutputFileName("output.log");
 
     singleton<LoggerFactory>::instance()->SetLevel(
         LogLevel::Error,
@@ -43,6 +45,8 @@ void master(int argc, const char** argv)
             singleton<LoggerFactory>::instance()->SetLevelByString(p);
         });
     }
+//    LOG(Error) << format("TTTIIIIIIIIIIIIIIIIIIIII");
+
 }
 
 int main(int argc, const char** argv)

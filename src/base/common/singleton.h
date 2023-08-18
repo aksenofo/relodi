@@ -14,11 +14,6 @@ class singleton
     singleton<T>() {}
 
 public:
-    static auto rinstance() -> T&
-    {
-        static singleton<T> st;
-        return st.payload_;
-    }
     static auto instance() -> T*
     {
         static singleton<T> st;

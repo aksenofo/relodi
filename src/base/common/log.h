@@ -6,9 +6,12 @@
 #pragma once
 
 #include <atomic>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <mutex>
+#include <ostream>
 #include <singleton.h>
 #include <sstream>
 #include <string>
@@ -44,7 +47,8 @@ enum class LogLevel : log_level_t {
 class LoggerFactory
 {
 public:
-    LoggerFactory() {}
+    LoggerFactory()
+    : m_mutex(std::make_unique<std::mutex>()) {}
 
     template<typename Args>
     void SetLevel(Args lt)
@@ -69,13 +73,13 @@ public:
     //! Print log
     void Print(const std::stringstream& ss)
     {
-        std::lock_guard<std::mutex> guard(m_mutex);
+        std::lock_guard<std::mutex> guard(*m_mutex);
         PrintSave(ss);
     }
 
     void SetPrintTimeStamp(bool flag = true)
     {
-        std::lock_guard<std::mutex> guard(m_mutex);
+        std::lock_guard<std::mutex> guard(*m_mutex);
         m_printTimestamp = flag;
     }
 
@@ -85,24 +89,37 @@ public:
         m_prefixText += ":";
     }
 
+    void SetOutputFileName(const std::string& name)
+    {
+        if (name.empty()) {
+            m_os.reset();
+        } else {
+            m_os = std::make_unique<std::ofstream>(name);
+        }
+    }
+
 private:
     std::string GetFilename(const char* argv0);
 
     //! Print exactly to ...
     virtual void PrintSave(const std::stringstream& ss)
     {
+        std::ostream& out = m_os ? *m_os : std::cout;
         if (m_printTimestamp)
-            std::cout << ToIso8601(std::chrono::system_clock::now()) << ">> " << m_prefixText << ss.str() << std::endl;
+            out
+                << ToIso8601(std::chrono::system_clock::now())
+                << ">> " << m_prefixText << ss.str() << std::endl;
         else
-            std::cout << m_prefixText << ss.str() << std::endl;
+            out << m_prefixText << ss.str() << std::endl;
     }
 
-    std::mutex m_mutex;                                                              //! Protect mutex
+    std::unique_ptr<std::mutex> m_mutex;                                             //! Protect mutex
     std::atomic<log_level_t> m_logLevel = static_cast<log_level_t>(LogLevel::Nolog); //! log level of application
 
     bool m_printTimestamp = false;
 
     std::string m_prefixText;
+    std::unique_ptr<std::ostream> m_os;
 };
 
 /*!
@@ -150,9 +167,9 @@ public:
 
     virtual ~Logger()
     {
-        auto& logger = singleton<LoggerFactory>::rinstance();
+        auto* logger = singleton<LoggerFactory>::instance();
         std::lock_guard<std::mutex> guard(m_mutex);
-        logger.Print(m_stringstream);
+        logger->Print(m_stringstream);
     }
 
 private:
