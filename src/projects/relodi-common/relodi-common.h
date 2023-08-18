@@ -10,24 +10,40 @@
 namespace relodi::common::utility
 {
 static bool need_to_correct = false;
-inline void correct(uint16_t& val)
-{
-    if (need_to_correct) {
-        auto t = val;
-        val = (t >> 8) | (t << 8);
-    }
-}
 
-inline void correct(uint32_t& val)
-{
-    if (need_to_correct) {
-        auto t = val;
-        val = ((t >> 24) & 0xff) |
-            ((t << 8) & 0xff0000) |
-            ((t >> 8) & 0xff00) |
-            ((t << 24) & 0xff000000);
+class ByteOrder {
+public:
+    static void correct(uint16_t& val)
+    {
+        if (need_to_correct) {
+            auto t = val;
+            val = (t >> 8) | (t << 8);
+        }
     }
-}
+
+    static void correct(uint32_t& val)
+    {
+        if (need_to_correct) {
+            auto t = val;
+            val = ((t >> 24) & 0xff) |
+                ((t << 8) & 0xff0000) |
+                ((t >> 8) & 0xff00) |
+                ((t << 24) & 0xff000000);
+        }
+    }
+
+    static void correct(uint64_t& ull)
+    {
+        ull = (ull >> 56) |
+            ((ull<<40) & 0x00FF000000000000) |
+            ((ull<<24) & 0x0000FF0000000000) |
+            ((ull<<8) & 0x000000FF00000000) |
+            ((ull>>8) & 0x00000000FF000000) |
+            ((ull>>24) & 0x0000000000FF0000) |
+            ((ull>>40) & 0x000000000000FF00) |
+            (ull << 56);
+    }
+};
 
 inline uint16_t calcChSum(const uint8_t* buffer, uint64_t size, uint16_t check )
 {
